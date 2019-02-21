@@ -1,0 +1,61 @@
+# Default values for dex
+# This is a YAML-formatted file.
+# Declare name/value pairs to be passed into your templates.
+# name: value
+
+image: quay.io/dexidp/dex
+imageTag: "v2.14.0"
+imagePullPolicy: "IfNotPresent"
+
+inMiniKube: true
+
+ingress:
+  enabled: true
+  path: /
+  hosts:
+    - dex.192.168.99.100.nip.io
+
+certs:
+  image: gcr.io/google_containers/kubernetes-dashboard-init-amd64
+  imageTag: "v1.0.0"
+  imagePullPolicy: "IfNotPresent"
+  web:
+    create: false
+  grpc:
+    create: false
+
+config:
+  issuer: http://dex.192.168.99.100.nip.io
+  connectors:
+#  - type: github
+#    id: github
+#    name: GitHub
+#    config:
+#      clientID: xxxxxxxxxxxxxxx
+#      clientSecret: yyyyyyyyyyyyyyyyyyyyy
+#      redirectURI: https://dex.minikube.local:5556/callback
+#      org: kubernetes
+  oauth2:
+    skipApprovalScreen: true
+
+  staticClients:
+    - id: example-app
+      redirectURIs:
+        - http://127.0.0.1:5555/callback
+        - http://127.0.0.1:4180/oauth2/callback
+        - http://upstream.192.168.99.100.nip.io/oauth2/callback
+      name: 'Example App'
+      secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+
+  enablePasswordDB: true
+  staticPasswords:
+    - email: "admin@example.com"
+      # bcrypt hash of the string "password"
+      hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+      username: "admin"
+      userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
+    # - email: "admin@elastisys.com"
+    #   # bcrypt hash of the string "password"
+    #   hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    #   username: "admin"
+    #   userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
