@@ -12,7 +12,6 @@ config:
   #   pass_basic_auth = false
   #   pass_access_token = true
   configFile: |
-    upstreams = ["http://upstream.192.168.99.100.nip.io"]
     pass_authorization_header = true
     cookie_secure = false
   # Use an existing secret for OAuth2 credentials
@@ -28,9 +27,9 @@ extraArgs:
   email-domain: "example.com"
   http-address: "0.0.0.0:4180"
   provider: oidc
-  # redirect-url: http://127.0.0.1:4180/oauth2/callback
-  redirect-url: http://upstream.192.168.99.100.nip.io/oauth2/callback
+  redirect-url: http://proxy.192.168.99.100.nip.io/oauth2/callback
   oidc-issuer-url: http://dex.192.168.99.100.nip.io
+  upstream: http://nginx.default.svc.cluster.local
 
 # To authorize individual email addresses
 # That is part of extraArgs but since this needs special treatment we need to do a separate section

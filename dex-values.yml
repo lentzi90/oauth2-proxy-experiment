@@ -41,9 +41,7 @@ config:
   staticClients:
     - id: example-app
       redirectURIs:
-        - http://127.0.0.1:5555/callback
-        - http://127.0.0.1:4180/oauth2/callback
-        - http://upstream.192.168.99.100.nip.io/oauth2/callback
+        - http://proxy.192.168.99.100.nip.io/oauth2/callback
       name: 'Example App'
       secret: ZXhhbXBsZS1hcHAtc2VjcmV0
 
