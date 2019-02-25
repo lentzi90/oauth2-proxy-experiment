@@ -14,18 +14,25 @@ ingress:
   path: /
   hosts:
     - dex.192.168.99.100.nip.io
+  tls:
+    # The certificate created by this chart
+    - secretName: dex-web-server-tls
+      hosts:
+        - dex.192.168.99.100.nip.io
 
 certs:
   image: gcr.io/google_containers/kubernetes-dashboard-init-amd64
   imageTag: "v1.0.0"
   imagePullPolicy: "IfNotPresent"
   web:
-    create: false
+    create: true
+    altNames:
+      - dex.192.168.99.100.nip.io
   grpc:
-    create: false
+    create: true
 
 config:
-  issuer: http://dex.192.168.99.100.nip.io
+  issuer: https://dex.192.168.99.100.nip.io
   connectors:
 #  - type: github
 #    id: github
@@ -41,8 +48,8 @@ config:
   staticClients:
     - id: example-app
       redirectURIs:
-        - http://proxy.192.168.99.100.nip.io/oauth2/callback
-      name: 'Example App'
+        - http://dashboard.192.168.99.100.nip.io/oauth2/callback
+      name: 'Kubernetes Dashboard'
       secret: ZXhhbXBsZS1hcHAtc2VjcmV0
 
   enablePasswordDB: true

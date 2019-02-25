@@ -12,8 +12,10 @@ config:
   #   pass_basic_auth = false
   #   pass_access_token = true
   configFile: |
-    pass_authorization_header = true
     cookie_secure = false
+    # pass_basic_auth = false
+    # pass_access_token = false
+    # pass_authorization_header = true
   # Use an existing secret for OAuth2 credentials
   # Example:
   # existingSecret: secret
@@ -27,9 +29,13 @@ extraArgs:
   email-domain: "example.com"
   http-address: "0.0.0.0:4180"
   provider: oidc
-  redirect-url: http://proxy.192.168.99.100.nip.io/oauth2/callback
-  oidc-issuer-url: http://dex.192.168.99.100.nip.io
-  upstream: http://nginx.default.svc.cluster.local
+  redirect-url: http://dashboard.192.168.99.100.nip.io/oauth2/callback
+  oidc-issuer-url: https://dex.192.168.99.100.nip.io
+  upstream: http://kubernetes-dashboard.kube-system.svc.cluster.local
+  pass-authorization-header: true
+  ssl-insecure-skip-verify: true
+  # pass-access-token: false
+  # pass-basic-auth: false
 
 # To authorize individual email addresses
 # That is part of extraArgs but since this needs special treatment we need to do a separate section
@@ -50,8 +56,7 @@ ingress:
   path: /
   # Used to create an Ingress record.
   hosts:
-    - upstream.192.168.99.100.nip.io
-    - proxy.192.168.99.100.nip.io
+    - dashboard.192.168.99.100.nip.io
   # annotations:
   #   kubernetes.io/ingress.class: nginx
   #   kubernetes.io/tls-acme: "true"
