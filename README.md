@@ -51,25 +51,33 @@ This certificate must be made available to the API server for it to trust dex as
 To accomplish this, we have to restart minikube (with additional flags) after installing dex the first time.
 
 ```
-minikube start \
-  --extra-config=apiserver.oidc-issuer-url=https://dex.192.168.99.100.nip.io \
-  --extra-config=apiserver.oidc-username-claim=email \
-  --extra-config=apiserver.oidc-client-id="example-app"
+minikube start
 # Wait for it to start, deploy dex and then restart once the certificate has
 # been generated.
+MINIKUBE_IP=$(minikube ip)
 helm init --wait
-helm upgrade --install dex dex -f dex-values.yml
+helm upgrade --install dex dex -f dex-values.yml \
+  --set ingress.hosts[0]=dex.$MINIKUBE_IP.nip.io \
+  --set ingress.tls[0].hosts[0]=dex.$MINIKUBE_IP.nip.io \
+  --set certs.web.altNames[0]=dex.$MINIKUBE_IP.nip.io \
+  --set config.issuer=https://dex.$MINIKUBE_IP.nip.io \
+  --set config.staticClients[0].redirectURIs[0]=http://dashboard.$MINIKUBE_IP.nip.io/oauth2/callback
 
 minikube start \
-  --extra-config=apiserver.oidc-issuer-url=https://dex.192.168.99.100.nip.io \
+  --extra-config=apiserver.oidc-issuer-url=https://dex.$MINIKUBE_IP.nip.io \
   --extra-config=apiserver.oidc-username-claim=email \
   --extra-config=apiserver.oidc-client-id="example-app" \
   --extra-config=apiserver.oidc-ca-file=/var/lib/minikube/certs/oidc.pem
 
-helm upgrade --install nginx-ingress stable/nginx-ingress --set controller.service.externalIPs[0]=$(minikube ip)
-helm upgrade --install oauth2 stable/oauth2-proxy -f oauth2-proxy-values.yml
+helm upgrade --install nginx-ingress stable/nginx-ingress --set controller.service.externalIPs[0]=$MINIKUBE_IP
+helm upgrade --install oauth2 stable/oauth2-proxy -f oauth2-proxy-values.yml \
+  --set extraArgs.redirect-url=http://dashboard.$MINIKUBE_IP.nip.io/oauth2/callback \
+  --set extraArgs.oidc-issuer-url=https://dex.$MINIKUBE_IP.nip.io \
+  --set ingress.hosts[0]=dashboard.$MINIKUBE_IP.nip.io
+
 kubectl apply -f dashboard.yaml
 kubectl apply -f rbac.yaml
-```
 
-Now try to login with `admin@example.com:password` at [dashboard.192.168.99.100.nip.io](http://dashboard.192.168.99.100.nip.io).
+echo "Log in to the k8s dashboard at http://dashboard.$MINIKUBE_IP.nip.io"
+echo "Use admin@example.com:password for credentials"
+```
