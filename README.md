@@ -56,7 +56,7 @@ minikube start
 # been generated.
 MINIKUBE_IP=$(minikube ip)
 helm init --wait
-helm upgrade --install dex stable/dex -f dex-values.yml \
+helm upgrade --install dex stable/dex --version 1.3.0 -f dex-values.yml \
   --set ingress.hosts[0]=dex.$MINIKUBE_IP.nip.io \
   --set ingress.tls[0].hosts[0]=dex.$MINIKUBE_IP.nip.io \
   --set certs.web.altNames[0]=dex.$MINIKUBE_IP.nip.io \
@@ -69,8 +69,10 @@ minikube start \
   --extra-config=apiserver.oidc-client-id="example-app" \
   --extra-config=apiserver.oidc-ca-file=/var/lib/minikube/certs/oidc.pem
 
-helm upgrade --install nginx-ingress stable/nginx-ingress --set controller.service.externalIPs[0]=$MINIKUBE_IP
-helm upgrade --install oauth2 stable/oauth2-proxy -f oauth2-proxy-values.yml \
+helm upgrade --install nginx-ingress stable/nginx-ingress --version 1.6.13 \
+  --set controller.service.externalIPs[0]=$MINIKUBE_IP
+helm upgrade --install oauth2 stable/oauth2-proxy --version 0.12.2 \
+  -f oauth2-proxy-values.yml \
   --set extraArgs.redirect-url=http://dashboard.$MINIKUBE_IP.nip.io/oauth2/callback \
   --set extraArgs.oidc-issuer-url=https://dex.$MINIKUBE_IP.nip.io \
   --set ingress.hosts[0]=dashboard.$MINIKUBE_IP.nip.io
