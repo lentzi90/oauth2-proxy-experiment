@@ -8,22 +8,8 @@ config:
   # python -c 'import os,base64; print base64.b64encode(os.urandom(16))'
   cookieSecret: "0oOQEbX9wB+VlaTBMO4KMw=="
   # Custom configuration file: oauth2_proxy.cfg
-  # configFile: |-
-  #   pass_basic_auth = false
-  #   pass_access_token = true
   configFile: |
     cookie_secure = false
-    # pass_basic_auth = false
-    # pass_access_token = false
-    # pass_authorization_header = true
-  # Use an existing secret for OAuth2 credentials
-  # Example:
-  # existingSecret: secret
-
-image:
-  repository: "quay.io/pusher/oauth2_proxy"
-  tag: "v3.1.0"
-  pullPolicy: "IfNotPresent"
 
 extraArgs:
   email-domain: "example.com"
@@ -34,34 +20,8 @@ extraArgs:
   upstream: http://kubernetes-dashboard.kube-system.svc.cluster.local
   pass-authorization-header: true
   ssl-insecure-skip-verify: true
-  # pass-access-token: false
-  # pass-basic-auth: false
-
-# To authorize individual email addresses
-# That is part of extraArgs but since this needs special treatment we need to do a separate section
-authenticatedEmailsFile:
-  enabled: false
-  # template is the name of the configmap what contains the email user list but has been configured without this chart.
-  # It's a simpler way to maintain only one configmap (user list) instead changing it for each oauth2-proxy service.
-  # Be aware the value name in the extern config map in data needs to be named to "restricted_user_access".
-  template: ""
-  # One email per line
-  # example:
-  # restricted_access: |-
-  #   name1@domain
-  #   name2@domain
 
 ingress:
   enabled: true
-  path: /
-  # Used to create an Ingress record.
   hosts:
     - dashboard.192.168.99.100.nip.io
-  # annotations:
-  #   kubernetes.io/ingress.class: nginx
-  #   kubernetes.io/tls-acme: "true"
-  # tls:
-    # Secrets must be manually created in the namespace.
-    # - secretName: chart-example-tls
-    #   hosts:
-    #     - chart-example.local
