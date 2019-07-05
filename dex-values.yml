@@ -11,6 +11,8 @@ ingress:
         - dex.192.168.99.100.nip.io
 
 certs:
+  securityContext:
+    enabled: false
   web:
     create: true
     altNames:

@@ -56,7 +56,7 @@ minikube start
 # been generated.
 MINIKUBE_IP=$(minikube ip)
 helm init --wait
-helm upgrade --install dex stable/dex --version 1.3.0 -f dex-values.yml \
+helm upgrade --install dex stable/dex --version 1.5.0 -f dex-values.yml \
   --set ingress.hosts[0]=dex.$MINIKUBE_IP.nip.io \
   --set ingress.tls[0].hosts[0]=dex.$MINIKUBE_IP.nip.io \
   --set certs.web.altNames[0]=dex.$MINIKUBE_IP.nip.io \
