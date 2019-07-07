@@ -2,38 +2,28 @@ inMiniKube: true
 
 ingress:
   enabled: true
-  hosts:
-    - dex.192.168.99.100.nip.io
+  # hosts:
+  #   - dex.192.168.99.100.nip.io
   tls:
     # The certificate created by this chart
     - secretName: dex-web-server-tls
-      hosts:
-        - dex.192.168.99.100.nip.io
+      # hosts:
+      #   - dex.192.168.99.100.nip.io
 
 certs:
   securityContext:
     enabled: false
   web:
     create: true
-    altNames:
-      - dex.192.168.99.100.nip.io
+    # altNames:
+    #   - dex.192.168.99.100.nip.io
 
 config:
-  issuer: https://dex.192.168.99.100.nip.io
-  connectors:
-#  - type: github
-#    id: github
-#    name: GitHub
-#    config:
-#      clientID: xxxxxxxxxxxxxxx
-#      clientSecret: yyyyyyyyyyyyyyyyyyyyy
-#      redirectURI: https://dex.minikube.local:5556/callback
-#      org: kubernetes
-
+  # issuer: https://dex.192.168.99.100.nip.io
   staticClients:
     - id: example-app
-      redirectURIs:
-        - http://dashboard.192.168.99.100.nip.io/oauth2/callback
+      # redirectURIs:
+      #   - http://dashboard.192.168.99.100.nip.io/oauth2/callback
       name: 'Kubernetes Dashboard'
       secret: ZXhhbXBsZS1hcHAtc2VjcmV0
 
