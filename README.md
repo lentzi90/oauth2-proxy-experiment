@@ -63,6 +63,8 @@ helm upgrade --install dex stable/dex --version 1.5.0 -f dex-values.yml \
   --set config.issuer=https://dex.$MINIKUBE_IP.nip.io \
   --set config.staticClients[0].redirectURIs[0]=http://dashboard.$MINIKUBE_IP.nip.io/oauth2/callback
 
+minikube ssh -c sudo cp /var/lib/localkube/oidc.pem /var/lib/minikube/certs/oidc.pem
+
 minikube start \
   --extra-config=apiserver.oidc-issuer-url=https://dex.$MINIKUBE_IP.nip.io \
   --extra-config=apiserver.oidc-username-claim=email \
