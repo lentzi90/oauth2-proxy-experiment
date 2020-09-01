@@ -51,29 +51,32 @@ This certificate must be made available to the API server for it to trust dex as
 To accomplish this, we have to restart minikube (with additional flags) after installing dex the first time.
 
 ```
-minikube start
-# Wait for it to start, deploy dex and then restart once the certificate has
-# been generated.
+minikube start --driver=virtualbox --addons=ingress
+# Wait for it to start, deploy dex and then edit the apiserver to use the cert.
 MINIKUBE_IP=$(minikube ip)
-helm init --wait
-helm upgrade --install dex stable/dex --version 1.5.0 -f dex-values.yml \
+helm upgrade --install dex stable/dex --version 2.13.0 -f dex-values.yml \
   --set ingress.hosts[0]=dex.$MINIKUBE_IP.nip.io \
   --set ingress.tls[0].hosts[0]=dex.$MINIKUBE_IP.nip.io \
   --set certs.web.altNames[0]=dex.$MINIKUBE_IP.nip.io \
   --set config.issuer=https://dex.$MINIKUBE_IP.nip.io \
   --set config.staticClients[0].redirectURIs[0]=http://dashboard.$MINIKUBE_IP.nip.io/oauth2/callback
 
-minikube ssh sudo cp /var/lib/localkube/oidc.pem /var/lib/minikube/certs/oidc.pem
+minikube ssh
+# In minikube ------------------------------------------------------------------
+sudo cp /var/lib/localkube/oidc.pem /var/lib/minikube/certs/oidc.pem
 
-minikube start \
-  --extra-config=apiserver.oidc-issuer-url=https://dex.$MINIKUBE_IP.nip.io \
-  --extra-config=apiserver.oidc-username-claim=email \
-  --extra-config=apiserver.oidc-client-id="example-app" \
-  --extra-config=apiserver.oidc-ca-file=/var/lib/minikube/certs/oidc.pem
+YQ_VERSION="3.2.1"
+curl -Lo yq_linux_amd64 "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64"
+chmod +x yq_linux_amd64
+sudo mv yq_linux_amd64 /usr/bin/yq
 
-helm upgrade --install nginx-ingress stable/nginx-ingress --version 1.6.13 \
-  --set controller.service.externalIPs[0]=$MINIKUBE_IP
-helm upgrade --install oauth2 stable/oauth2-proxy --version 0.12.2 \
+sudo yq w -i -- /etc/kubernetes/manifests/kube-apiserver.yaml 'spec.containers[0].command[+]' --oidc-username-claim=email
+sudo yq w -i -- /etc/kubernetes/manifests/kube-apiserver.yaml 'spec.containers[0].command[+]' --oidc-client-id=example-app
+sudo yq w -i -- /etc/kubernetes/manifests/kube-apiserver.yaml 'spec.containers[0].command[+]' --oidc-ca-file=/var/lib/minikube/certs/oidc.pem
+# End of minikube --------------------------------------------------------------
+minikube ssh -- sudo yq w -i -- /etc/kubernetes/manifests/kube-apiserver.yaml 'spec.containers[0].command[+]' --oidc-issuer-url=https://dex.$MINIKUBE_IP.nip.io
+
+helm upgrade --install oauth2 stable/oauth2-proxy --version 3.2.2 \
   -f oauth2-proxy-values.yml \
   --set extraArgs.redirect-url=http://dashboard.$MINIKUBE_IP.nip.io/oauth2/callback \
   --set extraArgs.oidc-issuer-url=https://dex.$MINIKUBE_IP.nip.io \
