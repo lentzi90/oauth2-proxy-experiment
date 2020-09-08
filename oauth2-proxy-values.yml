@@ -17,9 +17,10 @@ extraArgs:
   provider: oidc
   # redirect-url: http://dashboard.192.168.99.100.nip.io/oauth2/callback
   # oidc-issuer-url: https://dex.192.168.99.100.nip.io
-  upstream: http://kubernetes-dashboard.kube-system.svc.cluster.local
+  upstream: https://kubernetes-dashboard.kubernetes-dashboard.svc.cluster.local
   pass-authorization-header: true
   ssl-insecure-skip-verify: true
+  ssl-upstream-insecure-skip-verify: true
 
 ingress:
   enabled: true

@@ -82,7 +82,7 @@ helm upgrade --install oauth2 stable/oauth2-proxy --version 3.2.2 \
   --set extraArgs.oidc-issuer-url=https://dex.$MINIKUBE_IP.nip.io \
   --set ingress.hosts[0]=dashboard.$MINIKUBE_IP.nip.io
 
-kubectl apply -f dashboard.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.3/aio/deploy/recommended.yaml
 kubectl apply -f rbac.yaml
 
 echo "Log in to the k8s dashboard at http://dashboard.$MINIKUBE_IP.nip.io"
